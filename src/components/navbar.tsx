@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const navbar = () => {
   return (
     <div className="navbar bg-base-100">
@@ -24,13 +26,13 @@ const navbar = () => {
             className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
           >
             <li>
-              <a href="/pages/about">Main</a>
+              <Link href="/">Main</Link>
             </li>
             <li>
-              <a href="/pages/cognicy">Cognicy</a>
+              <Link href="/cognicy">Cognicy</Link>
             </li>
             <li>
-              <a href="/pages/developers">Developers</a>
+              <Link href="/developers">Developers</Link>
             </li>
           </ul>
         </div>
@@ -39,13 +41,13 @@ const navbar = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a href="about">Main</a>
+            <Link href="/">Main</Link>
           </li>
           <li>
-            <a href="cognicy">Cognicy</a>
+            <Link href="/cognicy">Cognicy</Link>
           </li>
           <li>
-            <a href="developers">Developers</a>
+            <Link href="/developers">Developers</Link>
           </li>
         </ul>
       </div>

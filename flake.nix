@@ -15,6 +15,9 @@
     in with pkgs; {
       devShells.default = mkShell {
         buildInputs = [
+          nodePackages.typescript-language-server
+          dolt
+          python3
           nodejs_20
           sqlite
           nodePackages.pnpm
