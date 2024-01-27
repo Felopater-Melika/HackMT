@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure-rest/ai-document-intelligence": "^1.0.0-beta.1",
+    "@azure/ai-form-recognizer": "^5.0.0",
+    "@azure/identity": "^4.0.1",
     "@prisma/client": "^5.8.1",
     "axios": "^1.6.7",
     "jotai": "^2.6.3",
