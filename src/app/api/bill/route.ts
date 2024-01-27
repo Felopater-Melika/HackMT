@@ -37,6 +37,8 @@ interface CombinedInfo {
 
 export async function POST(request: Request) {
   // get image from the request
+ const imageFormData = await request.formData() 
+ 
 
   // then take the image and feed it to azureOCR
   // const bill: BillLine[] = await azureOCR(image);
