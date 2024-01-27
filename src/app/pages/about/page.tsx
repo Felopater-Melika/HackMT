@@ -1,8 +1,8 @@
 "use client";
-import ImageUploadForm from "../components/FileUploadForm";
+import ImageUploadForm from "../../../components/FileUploadForm";
 
 import Image from "next/image";
-import "./globals.css";
+import "../../globals.css";
 
 export default function Home() {
   return (
@@ -31,18 +31,11 @@ export default function Home() {
               className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a>About</a>
+                <a>Main</a>
               </li>
               <li>
-                <a>Cognicy</a>
-                <ul className="p-2">
-                  <li>
-                    <a>Submenu 1</a>
-                  </li>
-                  <li>
-                    <a>Submenu 2</a>
-                  </li>
-                </ul>
+                <a >Cognicy</a>
+                
               </li>
               <li>
                 <a>Developers</a>
@@ -54,20 +47,10 @@ export default function Home() {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
             <li>
-              <a>About</a>
+              <a>Main</a>
             </li>
             <li>
-              <details>
-                <summary>Cognicy</summary>
-                <ul className="p-2">
-                  <li>
-                    <a>Submenu 1</a>
-                  </li>
-                  <li>
-                    <a>Submenu 2</a>
-                  </li>
-                </ul>
-              </details>
+              <a>Cognicy</a>
             </li>
             <li>
               <a>Developers</a>
