@@ -7,10 +7,10 @@ export default function Home() {
   return (
     <main>
       <Navbar />
-      <div className="inputStyle" style={{ marginLeft: 380 }}>
+      {/* center the drop field*/}
+      <div className="flex item-center mt-8 mb-8 justify-center w-full">
         <div
-          className="flex items-center justify-center w-full"
-          style={{ width: 750 }}
+          style={{ width: 450 }}
         >
           <label
             htmlFor="dropzone-file"
