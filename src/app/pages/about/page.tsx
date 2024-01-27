@@ -1,5 +1,6 @@
 "use client";
-import ImageUploadForm from "../../../components/FileUploadForm";
+import ImageUploadForm from "../../../components/ImageUploadForm";
+import Navbar from "../../../components/navbar";
 
 import Image from "next/image";
 import "../../globals.css";
@@ -7,59 +8,7 @@ import "../../globals.css";
 export default function Home() {
   return (
     <main>
-      <div className="navbar bg-base-100">
-        <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h8m-8 6h16"
-                />
-              </svg>
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <a>Main</a>
-              </li>
-              <li>
-                <a >Cognicy</a>
-                
-              </li>
-              <li>
-                <a>Developers</a>
-              </li>
-            </ul>
-          </div>
-          <a className="btn btn-ghost text-xl">daisyUI</a>
-        </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">
-            <li>
-              <a>Main</a>
-            </li>
-            <li>
-              <a>Cognicy</a>
-            </li>
-            <li>
-              <a>Developers</a>
-            </li>
-          </ul>
-        </div>
-        <div className="navbar-end"></div>
-      </div>
-
+      <Navbar />
       <div className="diff aspect-[16/9] ">
         <div className="diff-item-1">
           <div
@@ -84,91 +33,6 @@ export default function Home() {
           </div>
         </div>
         <div className="diff-resizer"></div>
-      </div>
-
-      <ImageUploadForm />
-
-      <div className="overflow-x-auto tableStyle rounded-md">
-        <table className="table table-zebra">
-          {/* head */}
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* row 1 */}
-            <tr>
-              <th>1</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
-              <td>Blue</td>
-            </tr>
-            {/* row 2 */}
-            <tr>
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Purple</td>
-            </tr>
-            {/* row 3 */}
-            <tr>
-              <th>3</th>
-              <td>Brice Swyre</td>
-              <td>Tax Accountant</td>
-              <td>Red</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div className="carousel carousel-item rounded-box caro0">
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg"
-            alt="Drink"
-          />
-          <div className="caro2">NAME iss</div>
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg"
-            alt="Drink"
-          />
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg"
-            alt="Drink"
-          />
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg"
-            alt="Drink"
-          />
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.jpg"
-            alt="Drink"
-          />
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1559181567-c3190ca9959b.jpg"
-            alt="Drink"
-          />
-        </div>
-        <div className="carousel-item caro">
-          <img
-            src="https://daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.jpg"
-            alt="Drink"
-          />
-        </div>
       </div>
 
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
