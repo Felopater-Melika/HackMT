@@ -1,16 +1,14 @@
-import axios from 'axios'
-export const dynamic = 'force-dynamic' // defaults to auto
+import axios from 'axios';
+export const dynamic = 'force-dynamic'; // defaults to auto
 
 // Felo will implement this
-async function azureOCR(image): BillLine[] {
-
-}
+async function azureOCR(billLine: BillLine[]) {}
 
 // backend team will implement this
 async function lookupNormalPrices(cptCodes: string[]) {
   // I'll get information about exactly what this URL will
   // be later.
-  const URL = "some localhost url with a different port"
+  const URL = 'some localhost url with a different port';
   // use axios.post; look up the documentation.
 }
 
@@ -41,18 +39,18 @@ export async function POST(request: Request) {
   // get image from the request
 
   // then take the image and feed it to azureOCR
-  const bill: BillLine[] = await azureOCR(image)
+  // const bill: BillLine[] = await azureOCR(image);
 
   // get the cpt codes out of the bill info
-  const cptCodes = bill.map(item => item.cptCode)
+  // const cptCodes = bill.map((item) => item.cptCode);
 
-  const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes)
+  // const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes);
 
   // TODO: combine this new info with the existing bill information to
   // add the hospital price to it. You could turn the bill array
   // into an object with the cpt codes as keys.
 
-  const combinedInfo: CombinedInfo[] = [] // however you make this
+  const combinedInfo: CombinedInfo[] = []; // however you make this
 
   /*
   const res = await fetch('https://data.mongodb-api.com/...', {
@@ -63,6 +61,6 @@ export async function POST(request: Request) {
   })
   const data = await res.json()
   */
- 
-  return Response.json(combinedInfo)
+
+  return Response.json(combinedInfo);
 }
