@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
 // Form that takes an image as an endpoint and hits the endpoint
 const ImageUploadForm = () => {
@@ -29,16 +29,16 @@ const ImageUploadForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
 
     try {
-      const response = await fetch("/api/bill", {
-        method: "POST",
-        body: formData,
+      const response = await fetch('/api/bill', {
+        method: 'POST',
+        body: formData
       });
       // Handle response if needed
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -59,9 +59,11 @@ const ImageUploadForm = () => {
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             {/* Display the file name if a file is selected */}
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              {file
-                ? file.name
-                : <span className="font-semibold">Click to upload</span>}
+              {file ? (
+                file.name
+              ) : (
+                <span className="font-semibold">Click to upload</span>
+              )}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               SVG, PNG, JPG or GIF (MAX. 800x400px)
