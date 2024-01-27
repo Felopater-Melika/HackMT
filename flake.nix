@@ -15,6 +15,7 @@
     in with pkgs; {
       devShells.default = mkShell {
         buildInputs = [
+          nodePackages.typescript-language-server
           nodejs_20
           sqlite
           nodePackages.pnpm
