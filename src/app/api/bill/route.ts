@@ -3,7 +3,7 @@ import { imageOptimizer } from 'next/dist/server/image-optimizer';
 export const dynamic = 'force-dynamic'; // defaults to auto
 
 // Felo will implement this
-async function azureOCR(billLine: BillLine[]) {
+async function azureOCR(image: File): Promise<BillLine[]> {
   return [
     {cptCode: '99284', hospitalPrice: 2000},
     {cptCode: '80048', hospitalPrice: 3000}
@@ -11,13 +11,25 @@ async function azureOCR(billLine: BillLine[]) {
 }
 
 // backend team will implement this
-async function lookupNormalPrices(cptCodes: string[]) {
+async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo[]> {
   // I'll get information about exactly what this URL will
   // be later.
-  const URL = 'some localhost url with a different port';
+  const URL = 'localhost:5000';
   //const res = await axios.post(URL, cptCodes)
   //return res.data;
   // use axios.post; look up the documentation.
+
+
+  //Potential use of Fetch
+  const res = await fetch(URL, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(cptCodes),
+  });
+  const data : PriceInfo [] = await res.json();
+
 
   // will return something like
   return [
@@ -70,7 +82,7 @@ export async function POST(request: Request) {
   const HospitalPrice = bill.map((item)=>item.hospitalPrice);
   
 
-  const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes);
+  const priceInfo: PriceInfo[] = await lookupNormalPrices(cptCodes);
 
   // TODO: combine this new info with the existing bill information to
   // add the hospital price to it. You could turn the bill array
@@ -89,6 +101,8 @@ export async function POST(request: Request) {
   for(let i = 0; i < len; i++){
     let billLine: BillLine = billIndex[priceInfo[i].cptCode];
     let highlighter = true;
+    //True means it doesnt get highlighted, this means the hospital price is less than normal price
+    //false means hospital price is higher than normal price.
     if(billLine.hospitalPrice - priceInfo[i].normalPrice > 0){
       highlighter = false;
     }
