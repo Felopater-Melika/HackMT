@@ -15,7 +15,7 @@
     in with pkgs; {
       devShells.default = mkShell {
         buildInputs = [
-          nodejs_21
+          nodejs_20
           sqlite
           nodePackages.pnpm
           prefetch-npm-deps
