@@ -27,8 +27,15 @@ const ImageUploadForm = () => {
     if (!file) {
       return;
     }
+    // send a post request api/bill
+    // with the image as the image field inside a formdata
+    const formData = new FormData();
 
-    alert('File uploaded!');
+    formData.append('image', file);
+    fetch('/api/bill', {
+      method: 'POST',
+      body: formData
+    });
   };
 
   return (
