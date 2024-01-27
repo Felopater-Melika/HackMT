@@ -17,6 +17,7 @@
 }
 
 body {
+  user-select: none;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -30,4 +31,30 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.inputStyle {
+  margin: auto;
+}
+
+.tableStyle {
+  margin: 15px 200px 15px 200px;
+  border: 0.2px solid rgba(134, 134, 134, 0.795);
+}
+
+.caro0 {
+  border: 1px solid rgba(134, 134, 134, 0.795);
+  margin: 20px;
+}
+
+.caro {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(134, 134, 134, 0.795);
+}
+
+.caro2 {
+  padding: 5px;
 }
