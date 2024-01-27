@@ -1,9 +1,9 @@
 'use client';
 import Image from 'next/image';
-import Navbar from '../../components/navbar';
-import { FormDataType } from '../../types/formData';
+import Navbar from '../../../components/navbar';
+import { FormDataType } from '@/types/formData';
 import ImageUploadForm from '@/components/ImageUploadForm';
-import '../globals.css';
+import '../cognicy/globals.css';
 import { useState } from 'react';
 import { loadBindings } from 'next/dist/build/swc';
 export default function Home() {
