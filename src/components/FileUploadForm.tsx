@@ -1,4 +1,5 @@
 'use client';
+import axios from 'axios';
 import React, { useState } from 'react';
 
 //form that takes an image as an endpoint, and hits the endpoint
@@ -21,21 +22,27 @@ const ImageUploadForm = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!file) {
       return;
     }
-    // send a post request api/bill
-    // with the image as the image field inside a formdata
-    const formData = new FormData();
 
+    const formData = new FormData();
     formData.append('image', file);
-    fetch('/api/bill', {
-      method: 'POST',
-      body: formData
-    });
+
+    try {
+      const response = await axios.post('/api/bill', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (

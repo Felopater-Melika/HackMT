@@ -8,24 +8,18 @@ const {
 const key = process.env.AZURE_AI_KEY as string;
 const endpoint = process.env.AZURE_AI_ENDPOINT;
 async function getImageAsBase64() {
-  // Adjust the path according to where your Next.js project root is
   const imagePath = './public/img_4.png';
-
-  // Read the file
   const imageBuffer = fs.readFileSync(imagePath);
-
-  // Convert to base64
   return imageBuffer.toString('base64');
 }
+
 async function azureOCR(base64Image: any) {
   const client = new DocumentAnalysisClient(
     endpoint,
     new AzureKeyCredential(key)
   );
-  // Convert base64 string to binary buffer
   const buffer = Buffer.from(base64Image, 'base64');
 
-  // Create a stream from the buffer
   const stream = Readable.from(buffer);
 
   const poller = await client.beginAnalyzeDocument('prebuilt-invoice', stream);
@@ -61,6 +55,8 @@ async function azureOCR(base64Image: any) {
     );
     console.log('Tax:', invoice.TotalTax?.content);
     console.log('Amount Due:', invoice.AmountDue?.content);
+
+    return result;
   } else {
     throw new Error('Expected at least one receipt in the result.');
   }
@@ -68,8 +64,11 @@ async function azureOCR(base64Image: any) {
 
 export async function POST(request: Request) {
   try {
-    const base64Image = await getImageAsBase64();
-    const ocrResult = await azureOCR(base64Image);
+    const data = await request.formData();
+    const file: File | null = data.get('image') as unknown as File;
+    const image = await file.arrayBuffer();
+    const ocrResult = await azureOCR(image);
+    console.log(JSON.stringify(ocrResult));
     return new Response(JSON.stringify(ocrResult), {
       status: 200,
       headers: {
