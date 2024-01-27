@@ -1,49 +1,59 @@
+'use client';
 import Image from 'next/image';
 import Navbar from '../../../components/navbar';
-
+import { FormDataType } from '../../../types/formData';
 import ImageUploadForm from '@/components/ImageUploadForm';
 import '../../globals.css';
+import { useState } from 'react';
+import { loadBindings } from 'next/dist/build/swc';
 export default function Home() {
+  const [formData, setFormData] = useState<FormDataType | null>(null);
+
+  console.log(formData);
   return (
     <main>
       <Navbar />
       {/* center the drop field*/}
-      <ImageUploadForm />
+      <ImageUploadForm setFormData={setFormData} />
       <div className="overflow-x-auto tableStyle rounded-md">
-        <table className="table table-zebra">
-          {/* head */}
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* row 1 */}
-            <tr>
-              <th>1</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
-              <td>Blue</td>
-            </tr>
-            {/* row 2 */}
-            <tr>
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Purple</td>
-            </tr>
-            {/* row 3 */}
-            <tr>
-              <th>3</th>
-              <td>Brice Swyre</td>
-              <td>Tax Accountant</td>
-              <td>Red</td>
-            </tr>
-          </tbody>
-        </table>
+        {formData ? (
+          <table className="table table-zebra">
+            {/* head */}
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Job</th>
+                <th>Favorite Color</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* row 1 */}
+              <tr>
+                <th>1</th>
+                <td>Cy Ganderton</td>
+                <td>Quality Control Specialist</td>
+                <td>Blue</td>
+              </tr>
+              {/* row 2 */}
+              <tr>
+                <th>2</th>
+                <td>Hart Hagerty</td>
+                <td>Desktop Support Technician</td>
+                <td>Purple</td>
+              </tr>
+              {/* row 3 */}
+              <tr>
+                <th>3</th>
+                <td>Brice Swyre</td>
+                <td>Tax Accountant</td>
+                <td>Red</td>
+              </tr>
+            </tbody>
+          </table>
+        ) : (
+          'loading'
+        )}
       </div>
 
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
