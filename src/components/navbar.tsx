@@ -39,13 +39,13 @@ const navbar = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>Main</a>
+            <a href="about">Main</a>
           </li>
           <li>
-            <a>Cognicy</a>
+            <a href="cognicy">Cognicy</a>
           </li>
           <li>
-            <a>Developers</a>
+            <a href="developers">Developers</a>
           </li>
         </ul>
       </div>

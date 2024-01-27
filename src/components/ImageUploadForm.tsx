@@ -1,11 +1,14 @@
-"use client";
-import React, { useState } from "react";
+'use client';
 
-// Form that takes an image as an endpoint and hits the endpoint
+// Import React and useState hook
+import React, { useState } from 'react';
+
+// Define the ImageUploadForm component
 const ImageUploadForm = () => {
+  // Define state variables for file and image preview URL
   const [file, setFile] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
+  // Define function to handle image change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (!e.target.files) {
@@ -14,13 +17,14 @@ const ImageUploadForm = () => {
     const reader = new FileReader();
     const selectedFile = e.target.files[0];
 
+    // Read the file and set state variables
     reader.onloadend = () => {
       setFile(selectedFile);
-      setImagePreviewUrl(reader.result as string);
     };
     reader.readAsDataURL(selectedFile);
   };
 
+  // Define function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -29,19 +33,20 @@ const ImageUploadForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
 
     try {
-      const response = await fetch("/api/bill", {
-        method: "POST",
-        body: formData,
+      const response = await fetch('/api/bill', {
+        method: 'POST',
+        body: formData
       });
       // Handle response if needed
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
     }
   };
 
+  // Return the JSX for the component
   return (
     <form
       onSubmit={handleSubmit}
@@ -59,27 +64,26 @@ const ImageUploadForm = () => {
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             {/* Display the file name if a file is selected */}
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              {file
-                ? file.name
-                : <span className="font-semibold">Click to upload</span>}
+              {file ? (
+                file.name
+              ) : (
+                <span className="font-semibold">Click to upload</span>
+              )}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               SVG, PNG, JPG or GIF (MAX. 800x400px)
             </p>
           </div>
-          <input
-            id="dropzone-file"
-            type="file"
-            className="hidden"
-            onChange={handleImageChange}
-          />
         </label>
+        {/* Separate file input field */}
+        <input id="dropzone-file" type="file" onChange={handleImageChange} />
       </div>
-      <button type="submit" className="btn">
-        Submit
+      <button type="submit" className="btn-primary" data-cy="missingButton">
+        submit
       </button>
     </form>
   );
 };
 
+// Export the ImageUploadForm component
 export default ImageUploadForm;
