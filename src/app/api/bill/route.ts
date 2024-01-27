@@ -87,14 +87,14 @@ export async function POST(request: Request) {
   //we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
   //create a new combined info data type and append it to the combinedInfo array
   for(let i = 0; i < len; i++){
-    let billLine = bill[priceInfo[i].cptCode]
+    let billLine: BillLine = billIndex[priceInfo[i].cptCode];
     let highlighter = true;
-    if(bill[i].hospitalPrice - priceInfo[i].normalPrice > 0){
+    if(billLine.hospitalPrice - priceInfo[i].normalPrice > 0){
       highlighter = false;
     }
     let newInfo: CombinedInfo = { 
-      cptCode: bill[i].cptCode, 
-      hospitalPrice: bill[i].hospitalPrice , 
+      cptCode: priceInfo[i].cptCode, 
+      hospitalPrice: billLine.hospitalPrice , 
       normalPrice: priceInfo[i].normalPrice, 
       description: priceInfo[i].description,
       highlight: highlighter 
