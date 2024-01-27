@@ -76,24 +76,30 @@ export async function POST(request: Request) {
   // add the hospital price to it. You could turn the bill array
   // into an object with the cpt codes as keys.
   let len = cptCodes.length;
-  
-const combinedInfo: CombinedInfo[] = []// however you make this
-//we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
-//create a new combined info data type and append it to the combinedInfo array
-for(let i = 0; i < len; i++){
- let highlighter = true;
-  if(bill[i].hospitalPrice - priceInfo[i].normalPrice > 0){
-    highlighter = false;
- }
- let newInfo: CombinedInfo = { 
-  cptCode: bill[i].cptCode, 
-  hospitalPrice: bill[i].hospitalPrice , 
-  normalPrice: priceInfo[i].normalPrice, 
-  description: priceInfo[i].description,
-  highlight: highlighter 
-}
-combinedInfo.push(newInfo);
 
+  let billIndex: {[key: string]: BillLine} = {};
+
+  for (let billLine of bill) {
+    billIndex[billLine.cptCode] = billLine;
+  }
+  
+  const combinedInfo: CombinedInfo[] = []// however you make this
+  //we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
+  //create a new combined info data type and append it to the combinedInfo array
+  for(let i = 0; i < len; i++){
+    let billLine = bill[priceInfo[i].cptCode]
+    let highlighter = true;
+    if(bill[i].hospitalPrice - priceInfo[i].normalPrice > 0){
+      highlighter = false;
+    }
+    let newInfo: CombinedInfo = { 
+      cptCode: bill[i].cptCode, 
+      hospitalPrice: bill[i].hospitalPrice , 
+      normalPrice: priceInfo[i].normalPrice, 
+      description: priceInfo[i].description,
+      highlight: highlighter 
+    }
+    combinedInfo.push(newInfo);
 }
 /*const combinedInfo: CombinedInfo = {
   cptCode:cptCodes[0], 
