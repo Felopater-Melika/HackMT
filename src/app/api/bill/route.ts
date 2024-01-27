@@ -1,32 +1,29 @@
-// import axios from 'axios';
-const fs = require('fs');
-const { Readable } = require('stream');
-const {
+import { Readable } from 'stream';
+import {
   AzureKeyCredential,
-  DocumentAnalysisClient
-} = require('@azure/ai-form-recognizer');
-const key = process.env.AZURE_AI_KEY as string;
-const endpoint = process.env.AZURE_AI_ENDPOINT;
-async function getImageAsBase64() {
-  const imagePath = './public/img_4.png';
-  const imageBuffer = fs.readFileSync(imagePath);
-  return imageBuffer.toString('base64');
-}
+  DocumentAnalysisClient,
+  AnalyzedDocument
+} from '@azure/ai-form-recognizer';
+// import axios from 'axios';
+export const dynamic = 'force-dynamic'; // defaults to auto
 
-async function azureOCR(base64Image: any) {
+async function azureOCR(file: File): Promise<BillLine[]> {
+  const key = process.env.AZURE_AI_KEY as string;
+  const endpoint = process.env.AZURE_AI_ENDPOINT as string;
   const client = new DocumentAnalysisClient(
     endpoint,
     new AzureKeyCredential(key)
   );
-  const buffer = Buffer.from(base64Image, 'base64');
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
   const stream = Readable.from(buffer);
 
   const poller = await client.beginAnalyzeDocument('prebuilt-invoice', stream);
 
-  const {
-    documents: [result]
-  } = await poller.pollUntilDone();
+  const res = await poller.pollUntilDone();
+  const [result] = res.documents as AnalyzedDocument[];
+  const output = [];
 
   if (result) {
     const invoice = result.fields;
@@ -37,7 +34,7 @@ async function azureOCR(base64Image: any) {
     console.log('Due Date:', invoice.DueDate?.content);
 
     console.log('Items:');
-    for (const { properties: item } of invoice.Items?.values ?? []) {
+    for (const { properties: item } of (invoice.Items as any)?.values ?? []) {
       console.log('  CPT Code:', item.ProductCode?.content ?? '<no CPT code>');
       console.log('  Description:', item.Description?.content);
       console.log('  Quantity:', item.Quantity?.content);
@@ -46,6 +43,13 @@ async function azureOCR(base64Image: any) {
       console.log('  Unit Price:', item.UnitPrice?.content);
       console.log('  Tax:', item.Tax?.content);
       console.log('  Amount:', item.Amount?.content);
+      let cptCode = item.ProductCode?.content as string;
+      let hospitalPrice: number = Number(item.UnitPrice?.content?.replaceAll("$", ""));
+      if (cptCode) {
+        output.push({
+          cptCode, hospitalPrice
+        });
+      }
     }
 
     console.log('Subtotal:', invoice.SubTotal?.content);
@@ -56,25 +60,102 @@ async function azureOCR(base64Image: any) {
     console.log('Tax:', invoice.TotalTax?.content);
     console.log('Amount Due:', invoice.AmountDue?.content);
 
-    return result;
+    return output;
   } else {
     throw new Error('Expected at least one receipt in the result.');
   }
 }
 
+// backend team will implement this
+async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo[]> {
+  // I'll get information about exactly what this URL will
+  // be later.
+  const URL = 'localhost:5000';
+
+  const res = await fetch(URL, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(cptCodes),
+  });
+  const data : PriceInfo [] = await res.json();
+
+  return data;
+}
+
+interface BillLine {
+  cptCode: string;
+  hospitalPrice: number;
+}
+
+interface PriceInfo {
+  cptCode: string;
+  normalPrice: number;
+  description: string;
+}
+
+interface CombinedInfo {
+  cptCode: string;
+  hospitalPrice: number;
+  normalPrice: number;
+  description: string;
+  /// Make this true if there's a big difference between hospitalPrice
+  /// and normalPrice
+  highlight: boolean;
+}
+
+// CPT Code:
+// in hospitals they need a consistent way to describe what
+// a procedure is, so CPT codes are one of the systems they
+// use. It's what's normally on itemized bills.
+
 export async function POST(request: Request) {
   try {
-    const data = await request.formData();
-    const file: File | null = data.get('image') as unknown as File;
-    const image = await file.arrayBuffer();
-    const ocrResult = await azureOCR(image);
-    console.log(JSON.stringify(ocrResult));
-    return new Response(JSON.stringify(ocrResult), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json'
+    // get image from the request
+    const imageFormData = await request.formData();
+   
+    const image = imageFormData.get('image') as File;
+
+    // then take the image and feed it to azureOCR
+    const bill: BillLine[] = await azureOCR(image);
+    
+    const priceInfo: PriceInfo[] = await lookupNormalPrices(
+      bill.map(item => item.cptCode)
+    );
+
+    // TODO: combine this new info with the existing bill information to
+    // add the hospital price to it. You could turn the bill array
+    // into an object with the cpt codes as keys.
+
+    let billIndex: {[key: string]: BillLine} = {};
+
+    for (let billLine of bill) {
+      billIndex[billLine.cptCode] = billLine;
+    }
+    
+    const combinedInfo: CombinedInfo[] = []// however you make this
+    //we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
+    //create a new combined info data type and append it to the combinedInfo array
+    for(let i = 0; i < bill.length; i++){
+      let billLine: BillLine = billIndex[priceInfo[i].cptCode];
+      let highlighter = true;
+      //True means it doesnt get highlighted, this means the hospital price is less than normal price
+      //false means hospital price is higher than normal price.
+      if(billLine.hospitalPrice - priceInfo[i].normalPrice > 0){
+        highlighter = false;
       }
-    });
+      let newInfo: CombinedInfo = { 
+        cptCode: priceInfo[i].cptCode, 
+        hospitalPrice: billLine.hospitalPrice , 
+        normalPrice: priceInfo[i].normalPrice, 
+        description: priceInfo[i].description,
+        highlight: highlighter 
+      }
+      combinedInfo.push(newInfo);
+    }
+
+    return Response.json(combinedInfo);
   } catch (error) {
     console.error('Error in GET request:', error);
     // @ts-ignore
@@ -86,69 +167,3 @@ export async function POST(request: Request) {
     });
   }
 }
-
-// export const dynamic = 'force-dynamic'; // defaults to auto
-
-// Felo will implement this
-
-// backend team will implement this
-// async function lookupNormalPrices(cptCodes: string[]) {
-// I'll get information about exactly what this URL will
-// be later.
-// const URL = 'some localhost url with a different port';
-// use axios.post; look up the documentation.
-// }
-
-// interface BillLine {
-//   cptCode: string;
-//   hospitalPrice: number;
-// }
-
-// interface PriceInfo {
-//   cptCode: string;
-//   normalPrice: number;
-//   description: string;
-// }
-
-// interface CombinedInfo {
-//   cptCode: string;
-//   hospitalPrice: number;
-//   normalPrice: number;
-//   description: string;
-// }
-
-// CPT Code:
-// in hospitals they need a consistent way to describe what
-// a procedure is, so CPT codes are one of the systems they
-// use. It's what's normally on itemized bills.
-
-// export async function POST(request: Request) {
-// get image from the request
-// const imageFormData = await request.formData();
-
-// then take the image and feed it to azureOCR
-// const bill: BillLine[] = await azureOCR(image);
-
-// get the cpt codes out of the bill info
-// const cptCodes = bill.map((item) => item.cptCode);
-
-// const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes);
-
-// TODO: combine this new info with the existing bill information to
-// add the hospital price to it. You could turn the bill array
-// into an object with the cpt codes as keys.
-
-// const combinedInfo: CombinedInfo[] = []; // however you make this
-
-/*
-  const res = await fetch('https://data.mongodb-api.com/...', {
-    headers: {
-      'Content-Type': 'application/json',
-      'API-Key': process.env.DATA_API_KEY,
-    },
-  })
-  const data = await res.json()
-  */
-
-// return Response.json(combinedInfo);
-// }
