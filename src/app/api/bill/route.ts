@@ -1,15 +1,29 @@
 import axios from 'axios';
+import { imageOptimizer } from 'next/dist/server/image-optimizer';
 export const dynamic = 'force-dynamic'; // defaults to auto
 
 // Felo will implement this
-async function azureOCR(billLine: BillLine[]) {}
+async function azureOCR(billLine: BillLine[]) {
+  return [
+    {cptCode: '99284', hospitalPrice: 2000},
+    {cptCode: '80048', hospitalPrice: 3000}
+  ]
+}
 
 // backend team will implement this
 async function lookupNormalPrices(cptCodes: string[]) {
   // I'll get information about exactly what this URL will
   // be later.
   const URL = 'some localhost url with a different port';
+  //const res = await axios.post(URL, cptCodes)
+  //return res.data;
   // use axios.post; look up the documentation.
+
+  // will return something like
+  return [
+    {cptCode: '99284', normalPrice: 2000, description: "Code a"},
+    {cptCode: '80048', normalPrice: 3000, description: "Code b"}
+  ]
 }
 
 interface BillLine {
@@ -28,6 +42,9 @@ interface CombinedInfo {
   hospitalPrice: number;
   normalPrice: number;
   description: string;
+  /// Make this true if there's a big difference between hospitalPrice
+  /// and normalPrice
+  highlight: boolean;
 }
 
 // CPT Code:
@@ -37,32 +54,51 @@ interface CombinedInfo {
 
 export async function POST(request: Request) {
   // get image from the request
- const imageFormData = await request.formData() 
+ const imageFormData = await request.formData();
  
+ const image = imageFormData.get('image') as File;
 
-  // then take the image and feed it to azureOCR
-  // const bill: BillLine[] = await azureOCR(image);
+ //console.log(image.name);
+
+ 
+ 
+ // then take the image and feed it to azureOCR
+  const bill: BillLine[] = await azureOCR(image);
 
   // get the cpt codes out of the bill info
-  // const cptCodes = bill.map((item) => item.cptCode);
+  const cptCodes = bill.map((item) => item.cptCode);
+  const HospitalPrice = bill.map((item)=>item.hospitalPrice);
+  
 
-  // const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes);
+  const priceInfo: PriceInfo[] = lookupNormalPrices(cptCodes);
 
   // TODO: combine this new info with the existing bill information to
   // add the hospital price to it. You could turn the bill array
   // into an object with the cpt codes as keys.
+  let len = cptCodes.length;
+  
+const combinedInfo: CombinedInfo[] = []// however you make this
+//we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
+//create a new combined info data type and append it to the combinedInfo array
+for(let i = 0; i < len; i++){
+ let highlighter = true;
+  if(bill[i].hospitalPrice - priceInfo[i].normalPrice > 0){
+    highlighter = false;
+ }
+ let newInfo: CombinedInfo = { 
+  cptCode: bill[i].cptCode, 
+  hospitalPrice: bill[i].hospitalPrice , 
+  normalPrice: priceInfo[i].normalPrice, 
+  description: priceInfo[i].description,
+  highlight: highlighter 
+}
+combinedInfo.push(newInfo);
 
-  const combinedInfo: CombinedInfo[] = []; // however you make this
-
-  /*
-  const res = await fetch('https://data.mongodb-api.com/...', {
-    headers: {
-      'Content-Type': 'application/json',
-      'API-Key': process.env.DATA_API_KEY,
-    },
-  })
-  const data = await res.json()
-  */
-
+}
+/*const combinedInfo: CombinedInfo = {
+  cptCode:cptCodes[0], 
+  hospitalPrice: HospitalPrice[0], 
+  normalPrice: 
+}*/
   return Response.json(combinedInfo);
 }
