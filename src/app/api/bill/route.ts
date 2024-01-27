@@ -1,89 +1,88 @@
 // import axios from 'axios';
-const fs = require("fs");
-const { Readable } = require("stream");
+const fs = require('fs');
+const { Readable } = require('stream');
 const {
   AzureKeyCredential,
-  DocumentAnalysisClient,
-} = require("@azure/ai-form-recognizer");
+  DocumentAnalysisClient
+} = require('@azure/ai-form-recognizer');
 const key = process.env.AZURE_AI_KEY as string;
 const endpoint = process.env.AZURE_AI_ENDPOINT;
 async function getImageAsBase64() {
-  // Adjust the path according to where your Next.js project root is
-  const imagePath = "./public/img_4.png";
-
-  // Read the file
+  const imagePath = './public/img_4.png';
   const imageBuffer = fs.readFileSync(imagePath);
-
-  // Convert to base64
-  return imageBuffer.toString("base64");
+  return imageBuffer.toString('base64');
 }
+
 async function azureOCR(base64Image: any) {
   const client = new DocumentAnalysisClient(
     endpoint,
-    new AzureKeyCredential(key),
+    new AzureKeyCredential(key)
   );
-  // Convert base64 string to binary buffer
-  const buffer = Buffer.from(base64Image, "base64");
+  const buffer = Buffer.from(base64Image, 'base64');
 
-  // Create a stream from the buffer
   const stream = Readable.from(buffer);
 
-  const poller = await client.beginAnalyzeDocument("prebuilt-invoice", stream);
+  const poller = await client.beginAnalyzeDocument('prebuilt-invoice', stream);
 
   const {
-    documents: [result],
+    documents: [result]
   } = await poller.pollUntilDone();
 
   if (result) {
     const invoice = result.fields;
 
-    console.log("Vendor Name:", invoice.VendorName?.content);
-    console.log("Customer Name:", invoice.CustomerName?.content);
-    console.log("Invoice Date:", invoice.InvoiceDate?.content);
-    console.log("Due Date:", invoice.DueDate?.content);
+    console.log('Vendor Name:', invoice.VendorName?.content);
+    console.log('Customer Name:', invoice.CustomerName?.content);
+    console.log('Invoice Date:', invoice.InvoiceDate?.content);
+    console.log('Due Date:', invoice.DueDate?.content);
 
-    console.log("Items:");
+    console.log('Items:');
     for (const { properties: item } of invoice.Items?.values ?? []) {
-      console.log("  CPT Code:", item.ProductCode?.content ?? "<no CPT code>");
-      console.log("  Description:", item.Description?.content);
-      console.log("  Quantity:", item.Quantity?.content);
-      console.log("  Date:", item.Date?.content);
-      console.log("  Unit:", item.Unit?.content);
-      console.log("  Unit Price:", item.UnitPrice?.content);
-      console.log("  Tax:", item.Tax?.content);
-      console.log("  Amount:", item.Amount?.content);
+      console.log('  CPT Code:', item.ProductCode?.content ?? '<no CPT code>');
+      console.log('  Description:', item.Description?.content);
+      console.log('  Quantity:', item.Quantity?.content);
+      console.log('  Date:', item.Date?.content);
+      console.log('  Unit:', item.Unit?.content);
+      console.log('  Unit Price:', item.UnitPrice?.content);
+      console.log('  Tax:', item.Tax?.content);
+      console.log('  Amount:', item.Amount?.content);
     }
 
-    console.log("Subtotal:", invoice.SubTotal?.content);
+    console.log('Subtotal:', invoice.SubTotal?.content);
     console.log(
-      "Previous Unpaid Balance:",
-      invoice.PreviousUnpaidBalance?.content,
+      'Previous Unpaid Balance:',
+      invoice.PreviousUnpaidBalance?.content
     );
-    console.log("Tax:", invoice.TotalTax?.content);
-    console.log("Amount Due:", invoice.AmountDue?.content);
+    console.log('Tax:', invoice.TotalTax?.content);
+    console.log('Amount Due:', invoice.AmountDue?.content);
+
+    return result;
   } else {
-    throw new Error("Expected at least one receipt in the result.");
+    throw new Error('Expected at least one receipt in the result.');
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const base64Image = await getImageAsBase64();
-    const ocrResult = await azureOCR(base64Image);
+    const data = await request.formData();
+    const file: File | null = data.get('image') as unknown as File;
+    const image = await file.arrayBuffer();
+    const ocrResult = await azureOCR(image);
+    console.log(JSON.stringify(ocrResult));
     return new Response(JSON.stringify(ocrResult), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
-      },
+        'Content-Type': 'application/json'
+      }
     });
   } catch (error) {
-    console.error("Error in GET request:", error);
+    console.error('Error in GET request:', error);
     // @ts-ignore
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
-        "Content-Type": "application/json",
-      },
+        'Content-Type': 'application/json'
+      }
     });
   }
 }
