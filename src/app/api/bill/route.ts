@@ -44,10 +44,13 @@ async function azureOCR(file: File): Promise<BillLine[]> {
       console.log('  Tax:', item.Tax?.content);
       console.log('  Amount:', item.Amount?.content);
       let cptCode = item.ProductCode?.content as string;
-      let hospitalPrice: number = Number(item.UnitPrice?.content?.replaceAll("$", ""));
+      let hospitalPrice: number = Number(
+        item.UnitPrice?.content?.replaceAll('$', '')
+      );
       if (cptCode) {
         output.push({
-          cptCode, hospitalPrice
+          cptCode,
+          hospitalPrice
         });
       }
     }
@@ -75,11 +78,11 @@ async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo[]> {
   const res = await fetch(URL, {
     method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(cptCodes),
+    body: JSON.stringify(cptCodes)
   });
-  const data : PriceInfo [] = await res.json();
+  const data: PriceInfo[] = await res.json();
 
   return data;
 }
@@ -111,47 +114,70 @@ interface CombinedInfo {
 // use. It's what's normally on itemized bills.
 
 export async function POST(request: Request) {
+  return Response.json([
+    {
+      cptCode: '12345',
+      hospitalPrice: 100,
+      normalPrice: 50,
+      description: 'A description',
+      highlight: true
+    },
+    {
+      cptCode: '55345',
+      hospitalPrice: 100,
+      normalPrice: 50,
+      description: 'A description',
+      highlight: true
+    },
+    {
+      cptCode: '33345',
+      hospitalPrice: 100,
+      normalPrice: 100,
+      description: 'A description b',
+      highlight: false
+    }
+  ]);
   try {
     // get image from the request
     const imageFormData = await request.formData();
-   
+
     const image = imageFormData.get('image') as File;
 
     // then take the image and feed it to azureOCR
     const bill: BillLine[] = await azureOCR(image);
-    
+
     const priceInfo: PriceInfo[] = await lookupNormalPrices(
-      bill.map(item => item.cptCode)
+      bill.map((item) => item.cptCode)
     );
 
     // TODO: combine this new info with the existing bill information to
     // add the hospital price to it. You could turn the bill array
     // into an object with the cpt codes as keys.
 
-    let billIndex: {[key: string]: BillLine} = {};
+    let billIndex: { [key: string]: BillLine } = {};
 
     for (let billLine of bill) {
       billIndex[billLine.cptCode] = billLine;
     }
-    
-    const combinedInfo: CombinedInfo[] = []// however you make this
+
+    const combinedInfo: CombinedInfo[] = []; // however you make this
     //we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
     //create a new combined info data type and append it to the combinedInfo array
-    for(let i = 0; i < bill.length; i++){
+    for (let i = 0; i < bill.length; i++) {
       let billLine: BillLine = billIndex[priceInfo[i].cptCode];
       let highlighter = true;
       //True means it doesnt get highlighted, this means the hospital price is less than normal price
       //false means hospital price is higher than normal price.
-      if(billLine.hospitalPrice - priceInfo[i].normalPrice > 0){
+      if (billLine.hospitalPrice - priceInfo[i].normalPrice > 0) {
         highlighter = false;
       }
-      let newInfo: CombinedInfo = { 
-        cptCode: priceInfo[i].cptCode, 
-        hospitalPrice: billLine.hospitalPrice , 
-        normalPrice: priceInfo[i].normalPrice, 
+      let newInfo: CombinedInfo = {
+        cptCode: priceInfo[i].cptCode,
+        hospitalPrice: billLine.hospitalPrice,
+        normalPrice: priceInfo[i].normalPrice,
         description: priceInfo[i].description,
-        highlight: highlighter 
-      }
+        highlight: highlighter
+      };
       combinedInfo.push(newInfo);
     }
 
