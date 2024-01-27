@@ -66,7 +66,7 @@ async function azureOCR(base64Image: any) {
   }
 }
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
     const base64Image = await getImageAsBase64();
     const ocrResult = await azureOCR(base64Image);
