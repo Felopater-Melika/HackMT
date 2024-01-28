@@ -6,7 +6,6 @@ import GroupPhoto from '../../images/20240127_172530.jpg';
 
 import '../globals.css';
 
-
 type Person = {
   name: string;
   picture?: string;
@@ -19,9 +18,14 @@ type Person = {
 const developers: Person[] = [
   {
     name: 'Jainish Patel',
-    role: "Front End",
+    role: 'Front End',
     github: 'https://github.com/jainish1510',
     linkedin: 'http://linkedin.com/in/jainish-p-6b853524a'
+  },
+  {
+    name: 'Samuel Thomas',
+    role: 'Database API Mentor'
+    // no picture
   },
   {
     name: 'Steven Dew',
@@ -74,7 +78,7 @@ const developers: Person[] = [
   {
     name: 'Felopater Melika',
     role: 'Full Stack & AI',
-    website: "https://felopater.vercel.app",
+    website: 'https://felopater.vercel.app',
     github: 'https://github.com/Felopater-Melika',
     linkedin: 'https://linkedin.com/in/Felopater-Melika'
   }
@@ -160,10 +164,16 @@ const developers: Person[] = [
       </div>
   */
 
-const DevLink: React.FC<{url?: string, logo?: boolean, children: React.ReactNode}> = ({url, children, logo}) => {
+const DevLink: React.FC<{
+  url?: string;
+  logo?: boolean;
+  children: React.ReactNode;
+}> = ({ url, children, logo }) => {
   if (url) {
     return (
-      <a href={url} className={"btn btn-primary" + (logo ? " btn-square" : "")}>{children}</a>
+      <a href={url} className={'btn btn-primary' + (logo ? ' btn-square' : '')}>
+        {children}
+      </a>
     );
   } else {
     return null;
@@ -181,12 +191,23 @@ export default function Home() {
       />
       <div className="w-full carousel carousel-center rounded-box p-10">
         {developers.map((dev, index) => (
-          <div className="carousel-item card mx-6 bg-base-100 shadow-xl">
-            <figure><img className="w-full overflow-clip h-96" src={dev.picture || "https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg"} alt="Picture of Developer" /></figure>
+          <div
+            key={index}
+            className="carousel-item card mx-6 bg-base-100 shadow-xl"
+          >
+            {dev.picture && (
+              <figure>
+                <img
+                  className="w-full overflow-clip h-96"
+                  src={dev.picture}
+                  alt="Picture of Developer"
+                />
+              </figure>
+            )}
             <div className="card-body">
               <h2 className="card-title">{dev.name}</h2>
               <p>{dev.role}</p>
-              
+
               <div className="card-actions justify-end">
                 <DevLink logo url={dev.github}>
                   <Image
@@ -198,7 +219,14 @@ export default function Home() {
                   />
                 </DevLink>
                 <DevLink logo url={dev.linkedin}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                  </svg>
                 </DevLink>
                 <DevLink url={dev.website}>Website</DevLink>
               </div>
