@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import HackthonLogo from '../images/HackthonProjectLogo.png';
 import Image from 'next/image';
 
 const navbar = () => {
@@ -28,10 +27,10 @@ const navbar = () => {
             className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
           >
             <li>
-              <Link href="/">Main</Link>
+              <Link href="/">About</Link>
             </li>
             <li>
-              <Link href="/cognicy">Cognicy</Link>
+              <Link href="/about">Upload</Link>
             </li>
             <li>
               <Link href="/developers">Developers</Link>
@@ -39,7 +38,7 @@ const navbar = () => {
           </ul>
         </div>
         <Image
-          src={HackthonLogo}
+          src="/public/HackathonProjectLogo.png"
           alt="Hackthon Logo"
           width={200}
           height={200}
@@ -48,10 +47,10 @@ const navbar = () => {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link href="/">Main</Link>
+            <Link href="/">About</Link>
           </li>
           <li>
-            <Link href="/cognicy">Cognicy</Link>
+            <Link href="/upload">Upload</Link>
           </li>
           <li>
             <Link href="/developers">Developers</Link>
