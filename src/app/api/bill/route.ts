@@ -115,37 +115,37 @@ interface CombinedInfo {
 
 export async function POST(request: Request) {
   // awiat a timeout for 3 seconds
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-  return Response.json([
-    {
-      cptCode: '12345',
-      hospitalPrice: 100,
-      normalPrice: 50,
-      description: 'hey this is dummy data',
-      highlight: false
-    },
-    {
-      cptCode: '55345',
-      hospitalPrice: 100,
-      normalPrice: 50,
-      description: 'this is also dummy data',
-      highlight: false
-    },
-    {
-      cptCode: '33345',
-      hospitalPrice: 100,
-      normalPrice: 100,
-      description: 'more dummy data',
-      highlight: true
-    },
-    {
-      cptCode: '12345',
-      hospitalPrice: 100,
-      normalPrice: 50,
-      description: 'hey this is dummy data',
-      highlight: true
-    }
-  ]);
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
+  // return Response.json([
+  //   {
+  //     cptCode: '12345',
+  //     hospitalPrice: 100,
+  //     normalPrice: 50,
+  //     description: 'hey this is dummy data',
+  //     highlight: false
+  //   },
+  //   {
+  //     cptCode: '55345',
+  //     hospitalPrice: 100,
+  //     normalPrice: 50,
+  //     description: 'this is also dummy data',
+  //     highlight: false
+  //   },
+  //   {
+  //     cptCode: '33345',
+  //     hospitalPrice: 100,
+  //     normalPrice: 100,
+  //     description: 'more dummy data',
+  //     highlight: true
+  //   },
+  //   {
+  //     cptCode: '12345',
+  //     hospitalPrice: 100,
+  //     normalPrice: 50,
+  //     description: 'hey this is dummy data',
+  //     highlight: true
+  //   }
+  // ]);
   try {
     // get image from the request
     const imageFormData = await request.formData();
