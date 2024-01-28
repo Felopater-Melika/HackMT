@@ -79,13 +79,6 @@ export default function Home() {
       <Navbar />
       {/* center the drop field*/}
       <ImageUploadForm setFormData={setFormData} setLoading={setIsLoading} />
-      {anyPriceAboveStandard && formData && (
-        <NegotiationScript
-          cptCodes={formData?.map((data) => data.cptCode)}
-          chargedPrices={formData?.map((data) => data.hospitalPrice)}
-          standardPrices={formData?.map((data) => data.normalPrice)}
-        />
-      )}
       <div className="overflow-x-auto tableStyle rounded-md">
         {/* {isLoading ? (
           'loading'
@@ -122,6 +115,13 @@ export default function Home() {
         </table>
         {/* )} */}
       </div>
+      {anyPriceAboveStandard && formData && (
+        <NegotiationScript
+          cptCodes={formData?.map((data) => data.cptCode)}
+          chargedPrices={formData?.map((data) => data.hospitalPrice)}
+          standardPrices={formData?.map((data) => data.normalPrice)}
+        />
+      )}
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
         <aside>
           <svg
