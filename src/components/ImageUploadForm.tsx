@@ -2,14 +2,18 @@
 
 // Import React and useState hook
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { FormDataType } from '../types/formData';
+import FormDataTypeArray from '../types/formData';
 
 interface ImageUploadFormProps {
-  setFormData: Dispatch<SetStateAction<FormDataType | null>>;
+  setFormData: Dispatch<SetStateAction<FormDataTypeArray | null>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 // Define the ImageUploadForm component
-const ImageUploadForm: React.FC<ImageUploadFormProps> = ({ setFormData }) => {
+const ImageUploadForm: React.FC<ImageUploadFormProps> = ({
+  setFormData,
+  setLoading
+}) => {
   // Define state variables for file and image preview URL
   const [file, setFile] = useState<File | null>(null);
 
@@ -41,14 +45,16 @@ const ImageUploadForm: React.FC<ImageUploadFormProps> = ({ setFormData }) => {
     image.append('image', file);
 
     try {
+      setLoading(true);
       const response = await fetch('/api/bill', {
         method: 'POST',
         body: image
       });
 
-      const formData: FormDataType = await response.json();
+      const formData: FormDataTypeArray = await response.json();
 
       setFormData(formData);
+      setLoading(false);
       // Handle response if needed
     } catch (error) {
       console.error('Error uploading image:', error);
