@@ -17,7 +17,7 @@ export default function Home() {
                 'url(https://images.unsplash.com/photo-1500964757637-c85e8a162699?q=80&w=1806&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)'
             }}
           >
-            BlueAid
+            <div className="text-primary-content text-9xl">BlueAid</div>
           </div>
         </div>
         <div className="diff-item-2">
@@ -32,6 +32,24 @@ export default function Home() {
           </div>
         </div>
         <div className="diff-resizer"></div>
+      </div>
+      <div className="place-content-center text-white text-2xl my-10 mx-20">
+        <p className="mb-10">
+          BlueAid is a project designed to help with overly expensive medical
+          bills. Hospitals cut deals with insurance companies to charge them
+          less money for the same procedure. Fortunately, if you're uninsured
+          and have a large bill, you can often negotiate with the hospital to
+          pay less.
+        </p>
+
+        <p className="">
+          This is where BlueAid helps: you take the itemized bill you recieve
+          from the hospital, take a picture of it, and then upload it to our
+          site. We'll then use an open source database of different costs for
+          common procedures to look up what the normal price is and compare it
+          to what the hospital is charging you. You can then take that
+          information into negotiations to ask for a lower price.
+        </p>
       </div>
 
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
