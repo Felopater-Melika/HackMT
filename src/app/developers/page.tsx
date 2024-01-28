@@ -2,71 +2,142 @@ import Navbar from '@/components/navbar';
 import Image from 'next/image';
 import githubLogo from '../../images/github-logo.png';
 import Link from 'next/link';
+import GroupPhoto from '../../images/20240127_172530.jpg';
+type Person = {
+  name: string;
+  github: string;
+  linkedin: string;
+};
+
+const frontendDevelopers: Person[] = [
+  {
+    name: 'Jainish Patel',
+    github: 'https://github.com/jainish1510',
+    linkedin: 'http://linkedin.com/in/jainish-p-6b853524a'
+  },
+  {
+    name: 'Steven Dew',
+    github: 'https://github.com/StevenD2002',
+    linkedin: 'www.linkedin.com/in/steven-dew'
+  },
+  {
+    name: 'Mariam Abbas',
+    github: '',
+    linkedin: 'https://www.linkedin.com/in/kwabena-fosuhene-595ba6129/'
+  },
+  {
+    name: 'Daniel Powers',
+    github: '',
+    linkedin: ''
+  },
+  {
+    name: 'Kwabena Fosuhene',
+    github: 'https://github.com/kof2c',
+    linkedin: 'https://www.linkedin.com/in/kwabena-fosuhene-595ba6129/'
+  }
+
+  // Add more developers as needed
+];
+
+const backendDevelopers: Person[] = [
+  {
+    name: 'Zach Taylor',
+    github: 'https://github.com/ZachTaylor2002',
+    linkedin: 'https://www.linkedin.com/in/zachary-taylor-5371a124a'
+  },
+  {
+    name: 'Einar Strandberg',
+    github: 'https://github.com/einargs',
+    linkedin: ''
+  },
+  {
+    name: 'Wesley Mitchell',
+    github: '',
+    linkedin: 'https://www.linkedin.com/in/wesley-mitchell-27078499/'
+  },
+  {
+    name: 'James Vest',
+    github: '',
+    linkedin: ''
+  },
+  {
+    name: 'Ryan Huml',
+    github: '',
+    linkedin: ''
+  },
+  {
+    name: 'Felopater Melika',
+    github: 'https://github.com/Felopater-Melika',
+    linkedin: ''
+  }
+];
 
 export default function Home() {
   return (
     <main>
       <Navbar />
-      <div className="carousel carousel-item rounded-box caro0">
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-          <div className="caro2">NAME iss</div>
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1559181567-c3190ca9959b.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-        <div className="carousel-item caro">
-          <Image
-            src="https://daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.jpg"
-            alt="Drink"
-            width={500}
-            height={500}
-          />
-        </div>
-      </div>
+      <Image
+        src={GroupPhoto}
+        alt="Group Photo"
+        className="w-1/4 mx-auto rounded-lg mt-8 mb-8"
+      />
 
+      <div className="flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-4">Frontend Developers</h1>
+        <ul>
+          {frontendDevelopers.map((dev, index) => (
+            <li key={index} className="mb-2">
+              <p className="font-bold">{dev.name}</p>
+              <div className="flex justify-center">
+                <a
+                  href={dev.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mx-2"
+                >
+                  GitHub
+                </a>
+                <a
+                  href={dev.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mx-2"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-4">Backend Developers</h1>
+        <ul>
+          {backendDevelopers.map((dev, index) => (
+            <li key={index} className="mb-2">
+              <p className="font-bold">{dev.name}</p>
+              <div className="flex justify-center">
+                <a
+                  href={dev.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mx-2"
+                >
+                  GitHub
+                </a>
+                <a
+                  href={dev.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mx-2"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
         <aside>
           <svg
