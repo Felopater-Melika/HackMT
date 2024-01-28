@@ -65,6 +65,14 @@ export default function Home() {
   const anyPriceAboveStandard = formData?.some(
     (data) => data.hospitalPrice > data.normalPrice
   );
+  const anyHighlight =
+    formData &&
+    formData.forEach((data) => {
+      if (data.highlight) {
+        return true;
+      }
+      return false;
+    });
   console.log(formData);
   return (
     <main>
