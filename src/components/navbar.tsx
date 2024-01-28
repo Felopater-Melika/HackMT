@@ -51,7 +51,6 @@ const navbar = () => {
           </li>
         </ul>
       </div>
-      <div className="navbar-end"></div>
     </div>
   );
 };
