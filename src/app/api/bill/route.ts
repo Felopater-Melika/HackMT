@@ -1,25 +1,25 @@
-import { Readable } from 'stream';
+import { Readable } from "stream";
 import {
+  AnalyzedDocument,
   AzureKeyCredential,
   DocumentAnalysisClient,
-  AnalyzedDocument
-} from '@azure/ai-form-recognizer';
+} from "@azure/ai-form-recognizer";
 // import axios from 'axios';
-export const dynamic = 'force-dynamic'; // defaults to auto
+export const dynamic = "force-dynamic"; // defaults to auto
 
 async function azureOCR(file: File): Promise<BillLine[]> {
   const key = process.env.AZURE_AI_KEY as string;
   const endpoint = process.env.AZURE_AI_ENDPOINT as string;
   const client = new DocumentAnalysisClient(
     endpoint,
-    new AzureKeyCredential(key)
+    new AzureKeyCredential(key),
   );
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
   const stream = Readable.from(buffer);
 
-  const poller = await client.beginAnalyzeDocument('prebuilt-invoice', stream);
+  const poller = await client.beginAnalyzeDocument("prebuilt-invoice", stream);
 
   const res = await poller.pollUntilDone();
   const [result] = res.documents as AnalyzedDocument[];
@@ -28,44 +28,44 @@ async function azureOCR(file: File): Promise<BillLine[]> {
   if (result) {
     const invoice = result.fields;
 
-    console.log('Vendor Name:', invoice.VendorName?.content);
-    console.log('Customer Name:', invoice.CustomerName?.content);
-    console.log('Invoice Date:', invoice.InvoiceDate?.content);
-    console.log('Due Date:', invoice.DueDate?.content);
+    console.log("Vendor Name:", invoice.VendorName?.content);
+    console.log("Customer Name:", invoice.CustomerName?.content);
+    console.log("Invoice Date:", invoice.InvoiceDate?.content);
+    console.log("Due Date:", invoice.DueDate?.content);
 
-    console.log('Items:');
+    console.log("Items:");
     for (const { properties: item } of (invoice.Items as any)?.values ?? []) {
-      console.log('  CPT Code:', item.ProductCode?.content ?? '<no CPT code>');
-      console.log('  Description:', item.Description?.content);
-      console.log('  Quantity:', item.Quantity?.content);
-      console.log('  Date:', item.Date?.content);
-      console.log('  Unit:', item.Unit?.content);
-      console.log('  Unit Price:', item.UnitPrice?.content);
-      console.log('  Tax:', item.Tax?.content);
-      console.log('  Amount:', item.Amount?.content);
+      console.log("  CPT Code:", item.ProductCode?.content ?? "<no CPT code>");
+      console.log("  Description:", item.Description?.content);
+      console.log("  Quantity:", item.Quantity?.content);
+      console.log("  Date:", item.Date?.content);
+      console.log("  Unit:", item.Unit?.content);
+      console.log("  Unit Price:", item.UnitPrice?.content);
+      console.log("  Tax:", item.Tax?.content);
+      console.log("  Amount:", item.Amount?.content);
       let cptCode = item.ProductCode?.content as string;
       let hospitalPrice: number = Number(
-        item.UnitPrice?.content?.replaceAll('$', '')
+        item.UnitPrice?.content?.replaceAll("$", ""),
       );
       if (cptCode) {
         output.push({
           cptCode,
-          hospitalPrice
+          hospitalPrice,
         });
       }
     }
 
-    console.log('Subtotal:', invoice.SubTotal?.content);
+    console.log("Subtotal:", invoice.SubTotal?.content);
     console.log(
-      'Previous Unpaid Balance:',
-      invoice.PreviousUnpaidBalance?.content
+      "Previous Unpaid Balance:",
+      invoice.PreviousUnpaidBalance?.content,
     );
-    console.log('Tax:', invoice.TotalTax?.content);
-    console.log('Amount Due:', invoice.AmountDue?.content);
+    console.log("Tax:", invoice.TotalTax?.content);
+    console.log("Amount Due:", invoice.AmountDue?.content);
 
     return output;
   } else {
-    throw new Error('Expected at least one receipt in the result.');
+    throw new Error("Expected at least one receipt in the result.");
   }
 }
 
@@ -73,14 +73,14 @@ async function azureOCR(file: File): Promise<BillLine[]> {
 async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo[]> {
   // I'll get information about exactly what this URL will
   // be later.
-  const URL = 'localhost:5000';
+  const URL = "localhost:5000";
 
   const res = await fetch(URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(cptCodes)
+    body: JSON.stringify(cptCodes),
   });
   const data: PriceInfo[] = await res.json();
 
@@ -116,38 +116,38 @@ interface CombinedInfo {
 export async function POST(request: Request) {
   return Response.json([
     {
-      cptCode: '12345',
+      cptCode: "12345",
       hospitalPrice: 100,
       normalPrice: 50,
-      description: 'A description',
-      highlight: true
+      description: "hey this is dummy data",
+      highlight: true,
     },
     {
-      cptCode: '55345',
+      cptCode: "55345",
       hospitalPrice: 100,
       normalPrice: 50,
-      description: 'A description',
-      highlight: true
+      description: "this is also dummy data",
+      highlight: true,
     },
     {
-      cptCode: '33345',
+      cptCode: "33345",
       hospitalPrice: 100,
       normalPrice: 100,
-      description: 'A description b',
-      highlight: false
-    }
+      description: "more dummy data",
+      highlight: false,
+    },
   ]);
   try {
     // get image from the request
     const imageFormData = await request.formData();
 
-    const image = imageFormData.get('image') as File;
+    const image = imageFormData.get("image") as File;
 
     // then take the image and feed it to azureOCR
     const bill: BillLine[] = await azureOCR(image);
 
     const priceInfo: PriceInfo[] = await lookupNormalPrices(
-      bill.map((item) => item.cptCode)
+      bill.map((item) => item.cptCode),
     );
 
     // TODO: combine this new info with the existing bill information to
@@ -176,20 +176,20 @@ export async function POST(request: Request) {
         hospitalPrice: billLine.hospitalPrice,
         normalPrice: priceInfo[i].normalPrice,
         description: priceInfo[i].description,
-        highlight: highlighter
+        highlight: highlighter,
       };
       combinedInfo.push(newInfo);
     }
 
     return Response.json(combinedInfo);
   } catch (error) {
-    console.error('Error in GET request:', error);
+    console.error("Error in GET request:", error);
     // @ts-ignore
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
   }
 }
