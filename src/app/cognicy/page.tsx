@@ -9,6 +9,7 @@ import { ResponseItem, CombinedInfo, FailedRow } from '@/types/responseForm';
 import githubLogo from '../../images/github-logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
+import NegotiationScript from '@/components/negotiationScript';
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD'
@@ -61,13 +62,22 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   const keysOfFormDataType = Object.keys({} as FormDataTypeArray[number]);
-
+  const anyPriceAboveStandard = formData?.some(
+    (data) => data.hospitalPrice > data.normalPrice
+  );
   console.log(formData);
   return (
     <main>
       <Navbar />
       {/* center the drop field*/}
       <ImageUploadForm setFormData={setFormData} setLoading={setIsLoading} />
+      {anyPriceAboveStandard && formData && (
+        <NegotiationScript
+          cptCodes={formData?.map((data) => data.cptCode)}
+          chargedPrices={formData?.map((data) => data.hospitalPrice)}
+          standardPrices={formData?.map((data) => data.normalPrice)}
+        />
+      )}
       <div className="overflow-x-auto tableStyle rounded-md">
         {/* {isLoading ? (
           'loading'
@@ -104,7 +114,6 @@ export default function Home() {
         </table>
         {/* )} */}
       </div>
-
       <footer className="footer footer-center p-10 bg-primary text-primary-content">
         <aside>
           <svg
