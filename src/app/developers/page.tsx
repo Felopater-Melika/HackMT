@@ -19,6 +19,7 @@ const developers: Person[] = [
   {
     name: 'Jainish Patel',
     role: 'Front End',
+    picture: '/janish.jpg',
     github: 'https://github.com/jainish1510',
     linkedin: 'http://linkedin.com/in/jainish-p-6b853524a'
   },
@@ -30,16 +31,19 @@ const developers: Person[] = [
   {
     name: 'Steven Dew',
     role: 'Front End',
+    picture: '/steven.jpg',
     github: 'https://github.com/StevenD2002',
     linkedin: 'www.linkedin.com/in/steven-dew'
   },
   {
     name: 'Mariam Abbas',
+    picture: '/marim.png',
     role: 'Database',
     linkedin: 'https://www.linkedin.com/in/kwabena-fosuhene-595ba6129/'
   },
   {
     name: 'Daniel Powers',
+    picture: '/danial.jpg',
     role: 'Designer'
   },
   {
@@ -52,11 +56,13 @@ const developers: Person[] = [
   {
     name: 'Zach Taylor',
     role: 'Front End',
+    picture: '/zach.jpg',
     github: 'https://github.com/ZachTaylor2002',
     linkedin: 'https://www.linkedin.com/in/zachary-taylor-5371a124a'
   },
   {
     name: 'Einar Strandberg',
+    picture: '/einar.jpg',
     role: 'Team Lead & Back End',
     github: 'https://github.com/einargs',
     linkedin: 'https://www.linkedin.com/in/einar-strandberg-358588299/',
@@ -73,14 +79,23 @@ const developers: Person[] = [
   },
   {
     name: 'Ryan Huml',
+    picture: '/ryan.jpg',
     role: 'Back End'
   },
   {
     name: 'Felopater Melika',
     role: 'Full Stack & AI',
+    picture: '/felo.jpg',
     website: 'https://felopater.vercel.app',
     github: 'https://github.com/Felopater-Melika',
     linkedin: 'https://linkedin.com/in/Felopater-Melika'
+  },
+  {
+    name: 'Ayush Kamath',
+    role: 'Presentation coordinator',
+    picture: '/ayush.webp',
+    github: 'https://github.com/Shinobiak',
+    linkedin: 'https://www.linkedin.com/in/ayush-kamath/'
   }
 ];
 
@@ -193,17 +208,15 @@ export default function Home() {
         {developers.map((dev, index) => (
           <div
             key={index}
-            className="carousel-item card mx-6 bg-base-100 shadow-xl"
+            className="carousel-item card mx-6 bg-base-100 shadow-xl overflow-scroll"
           >
-            {dev.picture && (
-              <figure>
-                <img
-                  className="w-full overflow-clip h-96"
-                  src={dev.picture}
-                  alt="Picture of Developer"
-                />
-              </figure>
-            )}
+            <figure>
+              <img
+                className="w-full overflow-clip h-96"
+                src={dev.picture || '/placeholder.jpg'}
+                alt="Picture of Developer"
+              />
+            </figure>
             <div className="card-body">
               <h2 className="card-title">{dev.name}</h2>
               <p>{dev.role}</p>
