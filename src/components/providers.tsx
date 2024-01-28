@@ -6,12 +6,7 @@ import { DevTools } from 'jotai-devtools';
 
 function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
   const store = createStore();
-  return (
-    <JotaiProvider store={store}>
-      {children}
-      <DevTools />
-    </JotaiProvider>
-  );
+  return <JotaiProvider store={store}>{children}</JotaiProvider>;
 }
 
 export default Providers;

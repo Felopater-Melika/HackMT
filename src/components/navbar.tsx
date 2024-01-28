@@ -58,6 +58,11 @@ const navbar = () => {
           </li>
         </ul>
       </div>
+      <div className="navbar-end">
+        <div className="flex items-center space-x-4">
+          <div className="hidden lg:block"></div>
+        </div>
+      </div>
     </div>
   );
 };
