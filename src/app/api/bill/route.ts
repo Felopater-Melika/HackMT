@@ -4,8 +4,9 @@ import {
   AzureKeyCredential,
   DocumentAnalysisClient
 } from '@azure/ai-form-recognizer';
-// import axios from 'axios';
+import axios from 'axios';
 export const dynamic = 'force-dynamic'; // defaults to auto
+import { ResponseItem, CombinedInfo, FailedRow } from '@/types/responseForm';
 
 async function azureOCR(file: File): Promise<BillLine[]> {
   const key = process.env.AZURE_AI_KEY as string;
@@ -28,13 +29,16 @@ async function azureOCR(file: File): Promise<BillLine[]> {
   if (result) {
     const invoice = result.fields;
 
+    /*
     console.log('Vendor Name:', invoice.VendorName?.content);
     console.log('Customer Name:', invoice.CustomerName?.content);
     console.log('Invoice Date:', invoice.InvoiceDate?.content);
     console.log('Due Date:', invoice.DueDate?.content);
 
     console.log('Items:');
+    */
     for (const { properties: item } of (invoice.Items as any)?.values ?? []) {
+      /*
       console.log('  CPT Code:', item.ProductCode?.content ?? '<no CPT code>');
       console.log('  Description:', item.Description?.content);
       console.log('  Quantity:', item.Quantity?.content);
@@ -43,18 +47,34 @@ async function azureOCR(file: File): Promise<BillLine[]> {
       console.log('  Unit Price:', item.UnitPrice?.content);
       console.log('  Tax:', item.Tax?.content);
       console.log('  Amount:', item.Amount?.content);
-      let cptCode = item.ProductCode?.content as string;
-      let hospitalPrice: number = Number(
-        item.UnitPrice?.content?.replaceAll('$', '')
-      );
+      */
+      let cptCodeRaw = item.ProductCode?.content;
+      let cptCode = null;
+      let description = item.Description?.content ?? 'no description';
+      if (cptCodeRaw === undefined) {
+        let result = description.match(/\d{5}/g);
+        if (result && result.length > 0) {
+          cptCode = result[0];
+        }
+      } else {
+        cptCode = cptCodeRaw;
+      }
+      let hospitalPriceRaw = item.Amount?.content?.replaceAll('$', '');
+      let hospitalPrice: number | null = null;
+      if (hospitalPriceRaw !== undefined) {
+        hospitalPrice = Number(hospitalPriceRaw);
+      }
+
       if (cptCode) {
         output.push({
           cptCode,
+          description,
           hospitalPrice
         });
       }
     }
 
+    /*
     console.log('Subtotal:', invoice.SubTotal?.content);
     console.log(
       'Previous Unpaid Balance:',
@@ -62,6 +82,7 @@ async function azureOCR(file: File): Promise<BillLine[]> {
     );
     console.log('Tax:', invoice.TotalTax?.content);
     console.log('Amount Due:', invoice.AmountDue?.content);
+    */
 
     return output;
   } else {
@@ -70,42 +91,39 @@ async function azureOCR(file: File): Promise<BillLine[]> {
 }
 
 // backend team will implement this
-async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo[]> {
+async function lookupNormalPrices(cptCodes: string[]): Promise<PriceInfo> {
   // I'll get information about exactly what this URL will
   // be later.
-  const URL = 'localhost:5000';
+  const URL = 'http://127.0.0.1:5000/price';
 
-  const res = await fetch(URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(cptCodes)
-  });
-  const data: PriceInfo[] = await res.json();
-
-  return data;
+  try {
+    /*
+    const res = await fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ bcodes: cptCodes })
+    });
+    const data: { avg_prices: PriceInfo[] } = await res.json();
+    */
+    const res = await axios.post(URL, { bcodes: cptCodes });
+    const data: { avg_prices: PriceInfo } = res.data;
+    return data.avg_prices;
+  } catch (error) {
+    console.error(error);
+    throw Error('Error in lookupNormalPrices');
+  }
 }
 
 interface BillLine {
   cptCode: string;
-  hospitalPrice: number;
+  hospitalPrice: number | null;
+  description: string;
 }
 
 interface PriceInfo {
-  cptCode: string;
-  normalPrice: number;
-  description: string;
-}
-
-interface CombinedInfo {
-  cptCode: string;
-  hospitalPrice: number;
-  normalPrice: number;
-  description: string;
-  /// Make this true if there's a big difference between hospitalPrice
-  /// and normalPrice
-  highlight: boolean;
+  [key: string]: number;
 }
 
 // CPT Code:
@@ -114,38 +132,6 @@ interface CombinedInfo {
 // use. It's what's normally on itemized bills.
 
 export async function POST(request: Request) {
-  // awiat a timeout for 3 seconds
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
-  // return Response.json([
-  //   {
-  //     cptCode: '12345',
-  //     hospitalPrice: 100,
-  //     normalPrice: 50,
-  //     description: 'hey this is dummy data',
-  //     highlight: false
-  //   },
-  //   {
-  //     cptCode: '55345',
-  //     hospitalPrice: 100,
-  //     normalPrice: 50,
-  //     description: 'this is also dummy data',
-  //     highlight: false
-  //   },
-  //   {
-  //     cptCode: '33345',
-  //     hospitalPrice: 100,
-  //     normalPrice: 100,
-  //     description: 'more dummy data',
-  //     highlight: true
-  //   },
-  //   {
-  //     cptCode: '12345',
-  //     hospitalPrice: 100,
-  //     normalPrice: 50,
-  //     description: 'hey this is dummy data',
-  //     highlight: true
-  //   }
-  // ]);
   try {
     // get image from the request
     const imageFormData = await request.formData();
@@ -153,46 +139,66 @@ export async function POST(request: Request) {
     const image = imageFormData.get('image') as File;
 
     // then take the image and feed it to azureOCR
-    const bill: BillLine[] = await azureOCR(image);
+    const billRaw: BillLine[] = await azureOCR(image);
+    const bill = billRaw.filter((item) => item.cptCode !== undefined);
 
-    const priceInfo: PriceInfo[] = await lookupNormalPrices(
+    const priceInfo: PriceInfo = await lookupNormalPrices(
       bill.map((item) => item.cptCode)
     );
+
+    const responseData: ResponseItem[] = [];
 
     // TODO: combine this new info with the existing bill information to
     // add the hospital price to it. You could turn the bill array
     // into an object with the cpt codes as keys.
 
-    let billIndex: { [key: string]: BillLine } = {};
+    let billIndex: {
+      [key: string]: {
+        bill: BillLine;
+        visited: boolean;
+      };
+    } = {};
 
     for (let billLine of bill) {
-      billIndex[billLine.cptCode] = billLine;
+      billIndex[billLine.cptCode] = { bill: billLine, visited: false };
     }
 
-    const combinedInfo: CombinedInfo[] = []; // however you make this
-    //we will use a for loop that will based on the number of CPT codes within the bill interface. each time it loops it will
-    //create a new combined info data type and append it to the combinedInfo array
-    for (let i = 0; i < bill.length; i++) {
-      let billLine: BillLine = billIndex[priceInfo[i].cptCode];
-      let highlighter = true;
+    for (let cptCode in priceInfo) {
+      const normalPrice = priceInfo[cptCode];
+      let billLine: BillLine = billIndex[cptCode].bill;
+      billIndex[cptCode].visited = true;
+      let highlighter = false;
       //True means it doesnt get highlighted, this means the hospital price is less than normal price
       //false means hospital price is higher than normal price.
-      if (billLine.hospitalPrice - priceInfo[i].normalPrice > 0) {
-        highlighter = false;
+      const diff = (billLine.hospitalPrice ?? normalPrice) - normalPrice;
+      if (diff > 20) {
+        highlighter = true;
       }
+
       let newInfo: CombinedInfo = {
-        cptCode: priceInfo[i].cptCode,
+        type: 'combinedInfo',
+        cptCode: cptCode,
         hospitalPrice: billLine.hospitalPrice,
-        normalPrice: priceInfo[i].normalPrice,
-        description: priceInfo[i].description,
+        normalPrice: normalPrice,
+        description: billLine.description,
         highlight: highlighter
       };
-      combinedInfo.push(newInfo);
+      responseData.push(newInfo);
     }
 
-    return Response.json(combinedInfo);
+    for (const item of Object.values(billIndex)) {
+      if (!item.visited) {
+        responseData.push({
+          type: 'failedRow',
+          description: item.bill.description,
+          cptCode: item.bill.cptCode
+        });
+      }
+    }
+
+    return Response.json(responseData);
   } catch (error) {
-    console.error('Error in GET request:', error);
+    console.error('Error in POST request:', error);
     // @ts-ignore
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
@@ -202,3 +208,36 @@ export async function POST(request: Request) {
     });
   }
 }
+
+// awiat a timeout for 3 seconds
+// await new Promise((resolve) => setTimeout(resolve, 3000));
+// return Response.json([
+//   {
+//     cptCode: '12345',
+//     hospitalPrice: 100,
+//     normalPrice: 50,
+//     description: 'hey this is dummy data',
+//     highlight: false
+//   },
+//   {
+//     cptCode: '55345',
+//     hospitalPrice: 100,
+//     normalPrice: 50,
+//     description: 'this is also dummy data',
+//     highlight: false
+//   },
+//   {
+//     cptCode: '33345',
+//     hospitalPrice: 100,
+//     normalPrice: 100,
+//     description: 'more dummy data',
+//     highlight: true
+//   },
+//   {
+//     cptCode: '12345',
+//     hospitalPrice: 100,
+//     normalPrice: 50,
+//     description: 'hey this is dummy data',
+//     highlight: true
+//   }
+// ]);

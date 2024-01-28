@@ -5,6 +5,55 @@ import FormDataTypeArray from '../../types/formData';
 import ImageUploadForm from '@/components/ImageUploadForm';
 import '../globals.css';
 import { useState } from 'react';
+import { ResponseItem, CombinedInfo, FailedRow } from '@/types/responseForm';
+
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+
+  // These options are needed to round to whole numbers if that's what you want.
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
+
+const getPrice = (price: Number | null) => {
+  if (price) {
+    return formatter.format(Number(price));
+  }
+  return 'N/A';
+};
+interface HandleRowParams {
+  data: ResponseItem;
+}
+const HandleRow: React.FC<HandleRowParams> = ({ data }) => {
+  if (data.type == 'failedRow') {
+    return (
+      <tr className="bg-blue-500">
+        <td>{data.cptCode}</td>
+        <td>{data.description}</td>
+        <td colSpan={2}>Did not have access to price data</td>
+      </tr>
+    );
+  } else {
+    return (
+      <tr className={data.highlight ? 'bg-red-500' : ''}>
+        <td>{data.cptCode}</td>
+        <td>{data.description}</td>
+        <td
+          style={getPrice(data.hospitalPrice) === 'N/A' ? { color: 'red' } : {}}
+        >
+          {getPrice(data.hospitalPrice)}
+        </td>
+        <td
+          style={getPrice(data.normalPrice) === 'N/A' ? { color: 'red' } : {}}
+        >
+          {getPrice(data.normalPrice)}
+        </td>
+      </tr>
+    );
+  }
+};
+
 export default function Home() {
   const [formData, setFormData] = useState<FormDataTypeArray | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,12 +89,7 @@ export default function Home() {
               </tr>
             ) : formData && formData.length > 0 ? (
               formData.map((data, index) => (
-                <tr key={index} className={data.highlight ? 'bg-red-500' : ''}>
-                  <td>{data.cptCode}</td>
-                  <td>{data.description}</td>
-                  <td>{data.hospitalPrice}</td>
-                  <td>{data.normalPrice}</td>
-                </tr>
+                <HandleRow key={index} data={data as ResponseItem} />
               ))
             ) : (
               <tr>
