@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import HackthonLogo from '../images/HackthonProjectLogo.png';
+import Image from 'next/image';
 
 const navbar = () => {
   return (
@@ -36,7 +38,12 @@ const navbar = () => {
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        <Image
+          src={HackthonLogo}
+          alt="Hackthon Logo"
+          width={200}
+          height={200}
+        />
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
