@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import HackathonProjectLogo from '../images/HackthonProjectLogo.png';
 import Image from 'next/image';
 
 const navbar = () => {
@@ -30,7 +31,7 @@ const navbar = () => {
               <Link href="/">About</Link>
             </li>
             <li>
-              <Link href="/about">Upload</Link>
+              <Link href="/upload">Upload</Link>
             </li>
             <li>
               <Link href="/developers">Developers</Link>
@@ -38,7 +39,7 @@ const navbar = () => {
           </ul>
         </div>
         <Image
-          src="/public/HackathonProjectLogo.png"
+          src="/HackathonProjectLogo.png"
           alt="Hackthon Logo"
           width={200}
           height={200}
