@@ -63,40 +63,48 @@ const ImageUploadForm: React.FC<ImageUploadFormProps> = ({
 
   // Return the JSX for the component
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="inputStyle"
-      style={{ marginLeft: 380 }}
-    >
-      <div
-        className="flex items-center justify-center w-full"
-        style={{ width: 750 }}
-      >
-        <label
-          htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+    <div className="flex flex-col items-center mt-8">
+      <form onSubmit={handleSubmit} className="inputStyle mt-8">
+        <div
+          // className="flex items-center justify-center w-full mt-8 mb-8"
+          style={{ width: 750 }}
         >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            {/* Display the file name if a file is selected */}
-            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              {file ? (
-                file.name
-              ) : (
-                <span className="font-semibold">Click to upload</span>
-              )}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              SVG, PNG, JPG or GIF (MAX. 800x400px)
-            </p>
-          </div>
-        </label>
-        {/* Separate file input field */}
-        <input id="dropzone-file" type="file" onChange={handleImageChange} />
-      </div>
-      <button type="submit" className="btn-primary" data-cy="missingButton">
-        submit
-      </button>
-    </form>
+          <label
+            htmlFor="dropzone-file"
+            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          >
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              {/* Display the file name if a file is selected */}
+              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                {file ? (
+                  file.name
+                ) : (
+                  <span className="font-semibold">Click to upload</span>
+                )}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                SVG, PNG, JPG or GIF (MAX. 800x400px)
+              </p>
+            </div>
+          </label>
+          {/* Separate file input field */}
+          <input
+            id="dropzone-file"
+            type="file"
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+          />
+        </div>
+        <div className="flex flex-col items-center">
+          <button
+            type="submit"
+            className="btn btn-active btn-primary mt-8 mb-4"
+          >
+            submit
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

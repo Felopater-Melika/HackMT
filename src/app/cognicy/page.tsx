@@ -18,44 +18,45 @@ export default function Home() {
       {/* center the drop field*/}
       <ImageUploadForm setFormData={setFormData} setLoading={setIsLoading} />
       <div className="overflow-x-auto tableStyle rounded-md">
-        {isLoading ? (
+        {/* {isLoading ? (
           'loading'
-        ) : (
-          <table className="table ">
-            {/* head */}
-            <thead>
+        ) : ( */}
+        <table className="table ">
+          {/* head */}
+          <thead>
+            <tr>
+              <th>cptCode</th>
+              <th>description</th>
+              <th>hospitalPrice</th>
+              <th>normalPrice</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
               <tr>
-                <th>cptCode</th>
-                <th>description</th>
-                <th>hospitalPrice</th>
-                <th>normalPrice</th>
+                <td colSpan={4} style={{ textAlign: 'center' }}>
+                  <span className="loading loading-dots loading-lg"></span>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {/* populate the table with the response data */}
-              {formData ? (
-                formData?.map((data, index) => (
-                  // if this index.highlight is true, then highlight the row
-                  <tr
-                    key={index}
-                    className={data.highlight ? 'bg-green-500' : ''}
-                  >
-                    <td>{data.cptCode}</td>
-                    <td>{data.description}</td>
-                    <td>{data.hospitalPrice}</td>
-                    <td>{data.normalPrice}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center' }}>
-                    No data
-                  </td>
+            ) : formData && formData.length > 0 ? (
+              formData.map((data, index) => (
+                <tr key={index} className={data.highlight ? 'bg-red-500' : ''}>
+                  <td>{data.cptCode}</td>
+                  <td>{data.description}</td>
+                  <td>{data.hospitalPrice}</td>
+                  <td>{data.normalPrice}</td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'center' }}>
+                  No data
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        {/* )} */}
       </div>
 
       <footer className="footer footer-center p-10 bg-primary text-primary-content">

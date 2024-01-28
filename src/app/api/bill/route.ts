@@ -114,6 +114,8 @@ interface CombinedInfo {
 // use. It's what's normally on itemized bills.
 
 export async function POST(request: Request) {
+  // awiat a timeout for 3 seconds
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   return Response.json([
     {
       cptCode: '12345',
